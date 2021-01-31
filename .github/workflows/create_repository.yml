@@ -62,7 +62,7 @@ jobs:
         run : |
           git checkout -b test
           sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
-          mv .env .env.testing
+          cp .env .env.testing
           git add -A
           git commit -am "Config branch test"
           git push --set-upstream origin test
@@ -72,7 +72,9 @@ jobs:
           git checkout -b staging
           mv .env.testing .env.staging
           php artisan key:generate --env=staging
+          cp .env.staging .env
           sed -i .env.staging -e 's/APP_ENV=testing/APP_ENV=staging/'
+          sed -i .env.staging -e 's/APP_DEBUG=true/APP_DEBUG=false/' 
           sed -i config/app.php  -e '/TelescopeServiceProvider/d'
           rm app/Providers/TelescopeServiceProvider.php 
           composer remove laravel/telescope --dev
@@ -85,6 +87,7 @@ jobs:
           git checkout -b production
           sed -i .env.staging -e 's/APP_ENV=staging/APP_ENV=production/'
           mv .env.staging .env.production
+          cp .env.staging .env
           git add -A
           git commit -am "Config staging branch"
           php artisan key:generate --env=production
