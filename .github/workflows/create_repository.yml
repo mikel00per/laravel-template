@@ -72,7 +72,7 @@ jobs:
           git checkout -b staging
           mv .env.testing .env.staging
           php artisan key:generate --env=staging
-          sed -i .env.staging -e 's/APP_ENV=local/APP_ENV=staging/'
+          sed -i .env.staging -e 's/APP_ENV=testing/APP_ENV=staging/'
           sed -i config/app.php  -e '/TelescopeServiceProvider/d'
           rm app/Providers/TelescopeServiceProvider.php 
           composer remove laravel/telescope --dev
@@ -83,6 +83,9 @@ jobs:
       - name: Creating production branch
         run : |
           git checkout -b production
+          sed -i .env.staging -e 's/APP_ENV=staging/APP_ENV=production/'
           mv .env.staging .env.production
+          git add -A
+          git commit -am "Config staging branch"
           php artisan key:generate --env=production
           git push --set-upstream origin production
