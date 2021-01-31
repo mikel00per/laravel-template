@@ -26,6 +26,6 @@ jobs:
           git commit -am "Automatic creation of Laravel"
           git push
           
-          git checkout -b test && git push --set-upstream origin tests
+          git checkout -b test && git push --set-upstream origin test
           git checkout -b staging && git push --set-upstream origin staging
           git checkout -b production && git push --set-upstream origin production
