@@ -15,10 +15,40 @@ jobs:
       - name: Create proyect Laravel.
         run: composer create-project laravel/laravel --prefer-dist --keep-vcs --no-interaction --ansi
         
-      - name: Remove .git of Laravel.
+      - name: Remove .git of Laravel
         run: rm -rf ./laravel/.git
         
-      - name: Commit and push
+      - name: Move files to prev folder
+        run: |
+          shopt -s dotglob nullglob
+          mv ./laravel/* ./
+          
+      - name: Remove .env from .gitignore
+        run: sed -i '' -e '/.env/d' .gitignore
+      
+      - name: Config .env
+        run: |
+          nameUpperCase=$(echo "this-is-the-string" | sed -r 's/(^|-)([a-z])/\U\2/g')
+          sed -i '' -e "s/APP_NAME=Laravel/APP_NAME=${nameUpperCase}/" .env
+          sed -i '' -e "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
+          sed -i '' -e "s/DB_PORT=3306/DB_PORT=5432/" .env
+          sed -i '' -e "s/DB_DATABASE=laravel/DB_DATABASE=${nameUpperCase}/" .env
+          sed -i '' -e "s/DB_USERNAME=root//" .env
+          sed -i '' -e "s/DB_PASSWORD=//" .env
+          sed -i '' -e "s/'username' => env('DB_USERNAME', 'forge'),/'username' => env('DB_USERNAME', getenv('dbUser')),/" config/database.php
+          sed -i '' -e "s/'password' => env('DB_PASSWORD', ''),/'password' => env('DB_PASSWORD', env('dbPassword')),/" config/database.php
+          
+      - name: Config require packages dev
+        run: |
+          composer require --dev laravel/telescope
+          composer require --dev barryvdh/laravel-ide-helper
+          composer require --dev doctrine/dbal
+          php artisan vendor:publish
+          php artisan clear-compiled
+          php artisan ide-helper:generate
+          php artisan telescope:install
+          
+      - name: Commit and push to dev
         run: |
           git config --global user.name 'Miguel Morillo'
           git config --global user.email 'miguelmwilliams@gmail.com'
@@ -26,6 +56,27 @@ jobs:
           git commit -am "Automatic creation of Laravel"
           git push
           
-          git checkout -b test && git push --set-upstream origin test
-          git checkout -b staging && git push --set-upstream origin staging
-          git checkout -b production && git push --set-upstream origin production
+      - name: Creating test branch
+        run : |
+          git checkout -b test
+          sed -i '' -e 's/APP_ENV=local/APP_ENV=testing/' .env
+          mv .env .env.testing
+          git commit -am "Config branch test"
+          git push --set-upstream origin test
+        
+      - name: Creating staging branch
+        run : |
+          git checkout -b staging
+          php artisan key:generate
+          sed -i '' -e 's/APP_ENV=local/APP_ENV=staging/' .env
+          sed -i '' -e '/TelescopeServiceProvider/d' config/app.php
+          rm app/Providers/TelescopeServiceProvider.php 
+          composer remove laravel/telescope --dev
+          mv .env .env.staging
+          git push --set-upstream origin staging
+        
+      - name: Creating production branch
+        run : |
+          git checkout -b production
+          php artisan key:generate
+          git push --set-upstream origin production
