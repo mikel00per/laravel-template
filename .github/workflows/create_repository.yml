@@ -27,19 +27,19 @@ jobs:
         run: ls -la
           
       - name: Remove .env from .gitignore
-        run: sed -i '' -e '.env/d' ./.gitignore
+        run:  sed -i .gitignore -e '/.env/d'
       
       - name: Config .env
         run: |
           nameUpperCase=$(echo "this-is-the-string" | sed -r 's/(^|-)([a-z])/\U\2/g')
-          sed -i '' -e "s/APP_NAME=Laravel/APP_NAME=${nameUpperCase}/" .env
-          sed -i '' -e "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/" .env
-          sed -i '' -e "s/DB_PORT=3306/DB_PORT=5432/" .env
-          sed -i '' -e "s/DB_DATABASE=laravel/DB_DATABASE=${nameUpperCase}/" .env
-          sed -i '' -e "s/DB_USERNAME=root//" .env
-          sed -i '' -e "s/DB_PASSWORD=//" .env
-          sed -i '' -e "s/'username' => env('DB_USERNAME', 'forge'),/'username' => env('DB_USERNAME', getenv('dbUser')),/" config/database.php
-          sed -i '' -e "s/'password' => env('DB_PASSWORD', ''),/'password' => env('DB_PASSWORD', env('dbPassword')),/" config/database.php
+          sed -i .env -e "s/APP_NAME=Laravel/APP_NAME=${nameUpperCase}/" 
+          sed -i .env -e "s/DB_CONNECTION=mysql/DB_CONNECTION=pgsql/"
+          sed -i .env -e "s/DB_PORT=3306/DB_PORT=5432/"
+          sed -i .env -e "s/DB_DATABASE=laravel/DB_DATABASE=${nameUpperCase}/"
+          sed -i .env -e "s/DB_USERNAME=root//"
+          sed -i .env -e "s/DB_PASSWORD=//"
+          sed -i config/database.php -e "s/'username' => env('DB_USERNAME', 'forge'),/'username' => env('DB_USERNAME', getenv('dbUser')),/"
+          sed -i config/database.php -e "s/'password' => env('DB_PASSWORD', ''),/'password' => env('DB_PASSWORD', env('dbPassword')),/"
           
       - name: Config require packages dev
         run: |
@@ -62,7 +62,7 @@ jobs:
       - name: Creating test branch
         run : |
           git checkout -b test
-          sed -i '' -e 's/APP_ENV=local/APP_ENV=testing/' .env
+          sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
           mv .env .env.testing
           git commit -am "Config branch test"
           git push --set-upstream origin test
@@ -70,12 +70,13 @@ jobs:
       - name: Creating staging branch
         run : |
           git checkout -b staging
+          mv .env.testing .env.staging
           php artisan key:generate
-          sed -i '' -e 's/APP_ENV=local/APP_ENV=staging/' .env
-          sed -i '' -e '/TelescopeServiceProvider/d' config/app.php
+          sed -i .env.staging -e 's/APP_ENV=local/APP_ENV=staging/'
+          sed -i config/app.php  -e '/TelescopeServiceProvider/d'
           rm app/Providers/TelescopeServiceProvider.php 
           composer remove laravel/telescope --dev
-          mv .env .env.staging
+          git commit -am "Config staging branch"
           git push --set-upstream origin staging
         
       - name: Creating production branch
