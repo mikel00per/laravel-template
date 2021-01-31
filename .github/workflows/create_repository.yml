@@ -71,7 +71,7 @@ jobs:
         run : |
           git checkout -b staging
           mv .env.testing .env.staging
-          php artisan key:generate
+          php artisan key:generate --env=staging
           sed -i .env.staging -e 's/APP_ENV=local/APP_ENV=staging/'
           sed -i config/app.php  -e '/TelescopeServiceProvider/d'
           rm app/Providers/TelescopeServiceProvider.php 
@@ -83,5 +83,5 @@ jobs:
       - name: Creating production branch
         run : |
           git checkout -b production
-          php artisan key:generate
+          php artisan key:generate --env=production
           git push --set-upstream origin production
