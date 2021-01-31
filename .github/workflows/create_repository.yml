@@ -66,13 +66,12 @@ jobs:
       - name: Creating test branch
         run : |
           git checkout -b test
-          cp .env .env.testing
+          nameUpperCase=$(echo "${{ github.event.repository.name }}" | sed -r 's/(^|-)([a-z])/\U\2/g')
           sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
-          sed -i .env -e "s/DB_CONNECTION=pgsql//"
-          sed -i .env -e "s/DB_PORT=5432//"
-          sed -i .env -e "s/DB_DATABASE=${nameUpperCase}//"
+          cp .env .env.testing
           sed -i .env.testing -e "s/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/"
           sed -i .env.testing -e "s/DB_DATABASE=${nameUpperCase}/DB_DATABASE=:memory:/"
+          sed -i .env.testing -e "s/DB_PORT=3306//"
           
           git add -A
           git commit -am "Config branch test"
