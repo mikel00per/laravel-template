@@ -1,0 +1,31 @@
+name: create_repository
+
+on:
+  create:
+    branches:
+      - dev
+
+jobs:
+  create_laravel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+    
+      - name: Create proyect Laravel.
+        run: composer create-project laravel/laravel --prefer-dist --keep-vcs --no-interaction --ansi
+        
+      - name: Remove .git of Laravel.
+        run: rm -rf ./laravel/.git
+        
+      - name: Commit and push
+        run: |
+          git config --global user.name 'Miguel Morillo'
+          git config --global user.email 'miguelmwilliams@gmail.com'
+          git add -A
+          git commit -am "Automatic creation of Laravel"
+          git push
+          
+          git checkout -b test && git push --set-upstream origin tests
+          git checkout -b staging && git push --set-upstream origin staging
+          git checkout -b production && git push --set-upstream origin production
