@@ -23,8 +23,11 @@ jobs:
           shopt -s dotglob nullglob
           mv ./laravel/* ./
           
+      - name: List dirs
+        run: ls -la
+          
       - name: Remove .env from .gitignore
-        run: sed -i '' -e '/.env/d' .gitignore
+        run: sed -i '' -e '.env/d' ./.gitignore
       
       - name: Config .env
         run: |
