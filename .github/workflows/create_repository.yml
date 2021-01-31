@@ -67,6 +67,11 @@ jobs:
         run : |
           git checkout -b test
           cp .env .env.testing
+          
+      - name: List dirsw
+        run: ls -la
+        
+      - name: Changing envs
           sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
           sed -i .env -e "s/DB_CONNECTION=pgsql//"
           sed -i .env -e "s/DB_PORT=5432//"
