@@ -83,5 +83,6 @@ jobs:
       - name: Creating production branch
         run : |
           git checkout -b production
+          mv .env.staging .env.production
           php artisan key:generate --env=production
           git push --set-upstream origin production
