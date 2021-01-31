@@ -67,18 +67,12 @@ jobs:
         run : |
           git checkout -b test
           cp .env .env.testing
-          
-      - name: List dirsw
-        run: ls -la
-        
-      - name: Changing envs
-        run: |
           sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
           sed -i .env -e "s/DB_CONNECTION=pgsql//"
           sed -i .env -e "s/DB_PORT=5432//"
           sed -i .env -e "s/DB_DATABASE=${nameUpperCase}//"
           sed -i .env.testing -e "s/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/"
-          sed -i .env.tenting -e "s/DB_DATABASE=${nameUpperCase}/DB_DATABASE=:memory:/"
+          sed -i .env.testing -e "s/DB_DATABASE=${nameUpperCase}/DB_DATABASE=:memory:/"
           
           git add -A
           git commit -am "Config branch test"
