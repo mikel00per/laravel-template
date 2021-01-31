@@ -69,21 +69,23 @@ jobs:
           nameUpperCase=$(echo "${{ github.event.repository.name }}" | sed -r 's/(^|-)([a-z])/\U\2/g')
           sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
           cp .env .env.testing
+          php artisan key:generate --env=testing
           sed -i .env.testing -e "s/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/"
           sed -i .env.testing -e "s/DB_DATABASE=${nameUpperCase}/DB_DATABASE=:memory:/"
-          sed -i .env.testing -e "s/DB_PORT=3306//"
+          sed -i .env.testing -e "s/DB_PORT=5432//"
+          sed -i .env.testing -e "s/DB_HOST=127.0.0.1//"
           
           git add -A
           git commit -am "Config branch test"
           git push --set-upstream origin test
-        
+
       - name: Creating staging branch
         run : |
           git checkout -b staging
-          mv .env.testing .env.staging
+          rm .env.testing
+          sed -i .env -e 's/APP_ENV=testing/APP_ENV=staging/'
+          cp .env .env.staging
           php artisan key:generate --env=staging
-          cp .env.staging .env
-          sed -i .env.staging -e 's/APP_ENV=testing/APP_ENV=staging/'
           sed -i .env.staging -e 's/APP_DEBUG=true/APP_DEBUG=false/' 
           sed -i config/app.php  -e '/TelescopeServiceProvider/d'
           rm app/Providers/TelescopeServiceProvider.php 
