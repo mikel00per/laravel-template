@@ -87,7 +87,7 @@ jobs:
           git checkout -b production
           sed -i .env.staging -e 's/APP_ENV=staging/APP_ENV=production/'
           mv .env.staging .env.production
-          cp .env.staging .env
+          cp .env.production .env
           git add -A
           git commit -am "Config staging branch"
           php artisan key:generate --env=production
