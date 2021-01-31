@@ -46,9 +46,8 @@ jobs:
           composer require --dev laravel/telescope
           composer require --dev barryvdh/laravel-ide-helper
           composer require --dev doctrine/dbal
-          php artisan vendor:publish
-          php artisan clear-compiled
-          php artisan ide-helper:generate
+          php artisan vendor:publish --all
+          php artisan clear-compiled --no-interaction
           php artisan telescope:install
           
       - name: Commit and push to dev
