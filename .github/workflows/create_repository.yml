@@ -50,6 +50,11 @@ jobs:
           php artisan clear-compiled --no-interaction
           php artisan telescope:install
           
+      - name: Config TestCase to execute tests
+        run: |
+          sed -i tests/TestCase.php -e 's/use Illuminate\\Foundation\\Testing\\TestCase as BaseTestCase;/use Illuminate\\Foundation\\Testing\\TestCase as BaseTestCase;\nuse Illuminate\\Foundation\\Testing\\DatabaseTransactions;\nuse Illuminate\\Foundation\\Testing\\DatabaseMigrations;/'
+          sed -i tests/TestCase.php -e 's/use CreatesApplication;/use CreatesApplication, DatabaseMigrations, DatabaseTransactions;/'
+          
       - name: Commit and push to dev
         run: |
           git config --global user.name 'Miguel Morillo'
@@ -61,8 +66,14 @@ jobs:
       - name: Creating test branch
         run : |
           git checkout -b test
-          sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
           cp .env .env.testing
+          sed -i .env -e 's/APP_ENV=local/APP_ENV=testing/'
+          sed -i .env -e "s/DB_CONNECTION=pgsql//"
+          sed -i .env -e "s/DB_PORT=5432//"
+          sed -i .env -e "s/DB_DATABASE=${nameUpperCase}//"
+          sed -i .env.testing -e "s/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/"
+          sed -i .env.tenting -e "s/DB_DATABASE=${nameUpperCase}/DB_DATABASE=\":memory:\"/"
+          
           git add -A
           git commit -am "Config branch test"
           git push --set-upstream origin test
