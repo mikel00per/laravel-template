@@ -1,6 +1,6 @@
 # Laravel template
 
-This repository is used to generate the default laravel project when you use the templase.
+This repository is used to generating the default laravel project when you use the template.
 
 ## How work
 
@@ -18,3 +18,5 @@ When you use this templase the dev branch is created, this active the CI and gen
  - Last laravel version
  - Config .env by envirotment
  - 4 branches; dev, test, staging, production. 
+ 
+ [Here](https://github.com/mikel00per/example-laravel-template)  you have an example of the result.
