@@ -15,10 +15,12 @@ jobs:
       - name: Create proyect Laravel.
         run: composer create-project laravel/laravel --prefer-dist --keep-vcs --no-interaction --ansi
         
-      - name: Remove .git of Laravel
-        run: rm -rf ./laravel/.git
-        
-      - name: Move files to prev folder
+      - name: Remove .git and .github of Laravel
+        run: |
+          rm -rf ./laravel/.git
+          rm -rf ./laravel/.github
+
+      - name: Move files to previous folder
         run: |
           shopt -s dotglob nullglob
           mv ./laravel/* ./
